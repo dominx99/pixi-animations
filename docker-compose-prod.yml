@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  recipes_nodejs:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile-prod
+    image: ghcr.io/dominx99/recipes-nodejs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - traefik.http.routers.recipes_frontend.rule=Host(`${DOMAIN}`)
+      - "traefik.http.routers.recipes_frontend.tls.certresolver=lets_encrypt_resolver"
+    expose:
+      - 8114
+    networks:
+      proxy:
+        ipv4_address: 10.200.18.6
+
+networks:
+  proxy:
+    external: true

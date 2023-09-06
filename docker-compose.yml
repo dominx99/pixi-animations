@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  tilesets_nodejs:
+    restart: unless-stopped
+    entrypoint: "/bin/sh ./docker-entrypoint-dev.sh"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/application
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - traefik.http.routers.tilesets_frontend.rule=Host(`${DOMAIN}`)
+      - "traefik.http.routers.tilesets_frontend.tls.certresolver=lets_encrypt_resolver"
+    expose:
+      - 3000
+    networks:
+      proxy:
+        ipv4_address: 10.200.31.6
+
+networks:
+  proxy:
+    external: true

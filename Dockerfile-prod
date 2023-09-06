@@ -1,0 +1,13 @@
+FROM node:16.14.2-buster
+
+WORKDIR /application
+
+COPY . .
+
+RUN yarn install --production --network-timeout 10000000
+RUN yarn build
+RUN yarn global add serve
+
+ENV PATH /application/node_modules/.bin:$PATH
+
+CMD ["serve", "-s", "/application/build", "-l", "8114"]
