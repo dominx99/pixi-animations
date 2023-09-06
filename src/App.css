@@ -1,11 +1,62 @@
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 body {
     background-color: #0f2b3b;
 }
 
-.tileset {
-    display: grid;
-    grid-template-columns: repeat(80, 32px);
-    grid-template-rows: repeat(6, 32px);
+html, body, #root, .app {
+    height: 100%;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    color: #fff;
+
+    .tileset-editor {
+        display: grid;
+        grid-template-columns: repeat(80, 32px);
+        grid-template-rows: repeat(6, 32px);
+
+        height: 50%;
+        overflow: auto;
+    }
+
+    .row {
+        display: flex;
+        flex-direction: row;
+        height: 50%;
+
+        .animation-editor {
+            height: 100%;
+            width: 50%;
+        }
+
+        .options-frame {
+            height: 100%;
+            width: 50%;
+        }
+    }
 }
 
 .tile {
