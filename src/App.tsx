@@ -13,7 +13,7 @@ function App() {
             <TilesetEditor socket={socket} />
             <div className="bottom-row">
                 <AnimationEditor socket={socket} />
-                <OptionsFrame />
+                <OptionsFrame socket={socket} />
             </div>
         </div>
     );

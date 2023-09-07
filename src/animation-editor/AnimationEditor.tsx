@@ -37,6 +37,16 @@ export default function AnimationEditor({ socket }: Props) {
         selectedTile: null
     });
 
+    const handleExport = () => {
+        fetch(process.env.REACT_APP_API_URL + '/api/export-tileset', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(state.tileset),
+        })
+    }
+
     const addTileToCurrentAnimationListener = (tiles: Tile[]) => {
         if (!state.selectedTile) {
             console.log('no selected tile', state);
@@ -68,11 +78,13 @@ export default function AnimationEditor({ socket }: Props) {
 
     useEffect(() => {
         socket.on('animations.current.add-tiles', addTileToCurrentAnimationListener);
+        socket.on('tileset.export', handleExport);
 
         updateAnimatedTileset();
 
         return () => {
             socket.off('animations.current.add-tiles', addTileToCurrentAnimationListener);
+            socket.off('tileset.export', handleExport);
         }
     }, [state.config, state.selectedTile]);
 

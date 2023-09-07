@@ -51,7 +51,7 @@ html, body, #root, .app {
             display: flex;
             flex-direction: row;
             height: 100%;
-            width: calc(50%);
+            width: calc(75%);
 
             .animations-timeline {
                 width: calc(64px + 2rem);
@@ -79,7 +79,8 @@ html, body, #root, .app {
 
         .options-frame {
             height: 100%;
-            width: 50%;
+            width: 25%;
+            margin: 1rem;
         }
     }
 }
@@ -116,4 +117,8 @@ input {
     opacity: .5;
     padding: 0.5rem;
     color: #fff;
+}
+
+button {
+    background-color: #0b5681;
 }
