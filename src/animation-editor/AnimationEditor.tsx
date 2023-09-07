@@ -38,12 +38,15 @@ export default function AnimationEditor({ socket }: Props) {
     });
 
     const handleExport = () => {
-        fetch(process.env.REACT_APP_API_URL + '/api/export-tileset', {
+        fetch(process.env.REACT_APP_API_URL + '/api/merge/pixi-animation-tileset', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(state.tileset),
+            body: JSON.stringify({
+                tileset: state.tileset,
+                config: state.config,
+            }),
         })
     }
 
