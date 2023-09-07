@@ -1,5 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
+import { EventEmitter } from 'events';
 
 export interface Tile {
     path: string;
@@ -15,7 +16,11 @@ interface Metadata {
     tileHeight: number;
 }
 
-export default function TilesetEditor() {
+interface Props {
+    socket: EventEmitter;
+}
+
+export default function TilesetEditor({ socket }: Props) {
     const [state, setState] = useState({
         metadata: {} as Metadata,
     });
@@ -34,6 +39,10 @@ export default function TilesetEditor() {
 
         fetchTilesAsync();
     }, []);
+
+    const handleAddTileToCurrentAnimation = (tiles: Tile[]) => {
+        socket.emit('animations.current.add-tiles', tiles);
+    }
 
     if (!state.metadata.framesX || !state.metadata.framesY) {
         return <div className="tileset"></div>
@@ -55,6 +64,7 @@ export default function TilesetEditor() {
                                 key={`${tile.x}-${tile.y}`}
                                 className="tile"
                                 style={{ backgroundImage: `url(${tile.path})` }}
+                                onDoubleClick={() => handleAddTileToCurrentAnimation([tile])}
                             ></div>
                         )
                     }))}

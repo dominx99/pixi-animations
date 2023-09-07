@@ -42,7 +42,7 @@ html, body, #root, .app {
         overflow: auto;
     }
 
-    .row {
+    .bottom-row {
         display: flex;
         flex-direction: row;
         height: 50%;
@@ -51,7 +51,13 @@ html, body, #root, .app {
             display: flex;
             flex-direction: row;
             height: 100%;
-            width: calc(50% - 4rem);
+            width: calc(50%);
+
+            .animations-timeline {
+                width: calc(64px + 2rem);
+                margin: 1rem;
+                overflow: auto;
+            }
 
             .animations-editor {
                 width: calc(100% / 3 * 2);
@@ -61,13 +67,13 @@ html, body, #root, .app {
                 grid-template-rows: repeat(5, 64px);
 
                 overflow: auto;
-                padding: 1rem;
+                margin: 1rem;
             }
 
-            .animations-config {
+            .animations-options {
                 width: calc(100% / 3);
                 height: 100%;
-                padding: 1rem;
+                margin: 1rem;
             }
         }
 
@@ -79,7 +85,7 @@ html, body, #root, .app {
 }
 
 .tile {
-    background-position: 100% 100%;
+    background-size: 100% 100%;
     width: 32px;
     height: 32px;
     border: 1px solid rgba(16, 57, 81, .5);
@@ -87,6 +93,10 @@ html, body, #root, .app {
     &.animation-tile {
         width: 64px;
         height: 64px;
+    }
+
+    &.tile-selected {
+        border: 1px solid #fff;
     }
 }
 

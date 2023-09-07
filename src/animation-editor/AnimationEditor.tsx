@@ -1,5 +1,9 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
+import { EventEmitter } from 'events';
 import { Tile } from './../tileset-editor/TilesetEditor';
+import AnimationOptions from './AnimationOptions';
+import AnimationTiles, { AnimationConfig } from './AnimationTiles';
+import AnimationTimeline from './AnimationTimeline';
 
 export interface AnimationTileset {
     tiles: AnimationTile[]
@@ -12,14 +16,16 @@ export interface AnimationTile {
 }
 
 export interface AnimationState {
-    config: {
-        framesX: number,
-        framesY: number
-    },
+    config: AnimationConfig,
     tileset: AnimationTileset,
+    selectedTile: AnimationTile | null
 }
 
-export default function AnimationEditor() {
+interface Props {
+    socket: EventEmitter;
+}
+
+export default function AnimationEditor({ socket }: Props) {
     const [state, setState] = useState<AnimationState>({
         config: {
             framesX: 5,
@@ -27,8 +33,48 @@ export default function AnimationEditor() {
         },
         tileset: {
             tiles: [],
-        }
+        },
+        selectedTile: null
     });
+
+    const addTileToCurrentAnimationListener = (tiles: Tile[]) => {
+        if (!state.selectedTile) {
+            console.log('no selected tile', state);
+            return;
+        }
+
+        const animationTile = state.tileset.tiles.find(tile => tile.x === state.selectedTile?.x && tile.y === state.selectedTile?.y);
+
+        if (!animationTile) {
+            console.log('no animation tile', state);
+            return;
+        }
+
+        animationTile.tiles.push(...tiles);
+
+        setState({
+            ...state,
+            tileset: {
+                ...state.tileset,
+                tiles: [
+                    ...state.tileset.tiles.filter(tile => tile.x !== animationTile.x || tile.y !== animationTile.y),
+                    animationTile
+                ]
+            }
+        });
+
+        console.log('got tile', tiles)
+    }
+
+    useEffect(() => {
+        socket.on('animations.current.add-tiles', addTileToCurrentAnimationListener);
+
+        updateAnimatedTileset();
+
+        return () => {
+            socket.off('animations.current.add-tiles', addTileToCurrentAnimationListener);
+        }
+    }, [state.config, state.selectedTile]);
 
     const handleChangeConfig = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -42,46 +88,57 @@ export default function AnimationEditor() {
         });
     }
 
+    const handleSelectTile = (tile: AnimationTile | null) => {
+        setState({
+            ...state,
+            selectedTile: tile
+        });
+    }
+
+    const updateAnimatedTileset = () => {
+        const tileset: AnimationTileset = {
+            tiles: []
+        };
+
+        const { framesX, framesY } = state.config;
+
+        for (let y = 0; y < framesY; y++) {
+            for (let x = 0; x < framesX; x++) {
+                const tile = state.tileset.tiles.find(tile => tile.x === x && tile.y === y);
+
+                if (tile) {
+                    tileset.tiles.push(tile);
+                } else {
+                    tileset.tiles.push({
+                        x,
+                        y,
+                        tiles: []
+                    });
+                }
+            }
+        }
+
+        setState({
+            ...state,
+            tileset
+        });
+    }
+
     return (
         <div className="animations-layout">
-            <div className="animations-editor" style={{
-                gridTemplateColumns: `repeat(${state.config.framesX}, 64px)`,
-                gridTemplateRows: `repeat(${state.config.framesY}, 64px)`,
-            }}>
-                {([...Array(state.config.framesY || 0)].map((_, y) => {
-                    return <Fragment key={y}>
-                        {([...Array(state.config.framesX || 0)].map((_, x) => {
-                            const tile = state.tileset.tiles.find(tile => tile.x === x && tile.y === y);
-
-                            if (!tile) {
-                                return <div className="animation-tile tile"></div>;
-                            }
-
-                            return (
-                                <div
-                                    key={`${tile.x}-${tile.y}`}
-                                    className="tile"
-                                    style={{ backgroundImage: `url(${tile.tiles[0].path})` }}
-                                ></div>
-                            )
-                        }))}
-                    </Fragment>
-                }))}
-            </div>
-            <div className="animations-config">
-                <div>
-                    <label className="mb-2 block" htmlFor="anim-x">Frames x</label>
-                    <input id="anim-x" name="framesX" className="mb-2 w-full" type="number" placeholder="5" defaultValue={state.config.framesX}
-                        onChange={handleChangeConfig}
-                    />
-                </div>
-                <div>
-                    <label className="mb-2 block" htmlFor="anim-y">Frames y</label>
-                    <input id="anim-y" name="framesY" className="w-full" type="number" placeholder="5" defaultValue={state.config.framesX}
-                        onChange={handleChangeConfig}
-                    />
-                </div>
-            </div>
+            <AnimationTiles
+                config={state.config}
+                tileset={state.tileset}
+                selectedTile={state.selectedTile}
+                handleSelectTile={handleSelectTile}
+            />
+            <AnimationTimeline
+                tile={state.selectedTile}
+            />
+            <AnimationOptions
+                config={state.config}
+                handleChangeConfig={handleChangeConfig}
+            />
         </div>
     )
 }
