@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { AnimationTile, AnimationTileset } from "./AnimationEditor";
 
 export interface AnimationConfig {
@@ -14,6 +14,10 @@ interface Props {
 }
 
 export default function AnimationEditor(props: Props) {
+    useEffect(() => {
+        console.log('got tileset', props.tileset);
+    }, [props.tileset])
+
     return (
         <div className="animations-editor" style={{
             gridTemplateColumns: `repeat(${props.config.framesX}, 64px)`,

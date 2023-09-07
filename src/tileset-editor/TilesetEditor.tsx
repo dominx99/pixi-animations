@@ -8,6 +8,11 @@ export interface Tile {
     y: number;
 }
 
+export interface Position {
+    x: number;
+    y: number;
+}
+
 interface Metadata {
     tiles: Tile[];
     framesX: number;
@@ -20,9 +25,21 @@ interface Props {
     socket: EventEmitter;
 }
 
+interface State {
+    metadata: Metadata;
+    draw: {
+        startPosition: Position | null;
+        endPosition: Position | null;
+    }
+}
+
 export default function TilesetEditor({ socket }: Props) {
-    const [state, setState] = useState({
+    const [state, setState] = useState<State>({
         metadata: {} as Metadata,
+        draw: {
+            startPosition: null,
+            endPosition: null,
+        }
     });
 
     useEffect(() => {
@@ -33,6 +50,7 @@ export default function TilesetEditor({ socket }: Props) {
             console.log(metadata);
 
             setState({
+                ...state,
                 metadata: metadata,
             });
         };
@@ -40,8 +58,79 @@ export default function TilesetEditor({ socket }: Props) {
         fetchTilesAsync();
     }, []);
 
-    const handleAddTileToCurrentAnimation = (tiles: Tile[]) => {
+    useEffect(() => {
+        addTilesToCurrentAnimationFromDraw();
+    }, [state.draw])
+
+    const handleAddTilesToCurrentAnimation = (tiles: Tile[]) => {
         socket.emit('animations.current.add-tiles', tiles);
+    }
+
+    const handleSelectPoint = ({ x, y }: { x: number, y: number }) => {
+        if (!state.draw.startPosition) {
+            setState({
+                ...state,
+                draw: {
+                    ...state.draw,
+                    startPosition: {
+                        x: x,
+                        y: y,
+                    }
+                }
+            });
+
+            return;
+        }
+
+        if (!state.draw.endPosition) {
+            setState({
+                ...state,
+                draw: {
+                    ...state.draw,
+                    endPosition: {
+                        x: x,
+                        y: y,
+                    }
+                }
+            });
+
+            return;
+        }
+    }
+
+    const addTilesToCurrentAnimationFromDraw = () => {
+        console.log(state);
+        if (!state.draw.startPosition || !state.draw.endPosition) {
+            console.log('no start or end position');
+
+            return;
+        }
+
+        const tiles: Tile[] = [];
+
+        for (let x = state.draw.startPosition.x; x <= state.draw.endPosition.x; x++) {
+            for (let y = state.draw.startPosition.y; y <= state.draw.endPosition.y; y++) {
+                const tile = state.metadata.tiles.find(tile => tile.x === x && tile.y === y);
+
+                if (!tile) {
+                    continue;
+                }
+
+                tiles.push(tile);
+            }
+        }
+
+        console.log('add', tiles);
+
+        handleAddTilesToCurrentAnimation(tiles);
+
+        setState({
+            ...state,
+            draw: {
+                startPosition: null,
+                endPosition: null,
+            }
+        });
     }
 
     if (!state.metadata.framesX || !state.metadata.framesY) {
@@ -62,9 +151,13 @@ export default function TilesetEditor({ socket }: Props) {
                         return (
                             <div
                                 key={`${tile.x}-${tile.y}`}
-                                className="tile"
+                                className={'tile' + (state.draw.startPosition
+                                    && state.draw.startPosition.x === tile.x
+                                    && state.draw.startPosition.y === tile.y
+                                    ? ' tile-selected-start' : ''
+                                )}
                                 style={{ backgroundImage: `url(${tile.path})` }}
-                                onDoubleClick={() => handleAddTileToCurrentAnimation([tile])}
+                                onClick={() => handleSelectPoint({ ...tile })}
                             ></div>
                         )
                     }))}

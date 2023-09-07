@@ -124,6 +124,32 @@ export default function AnimationEditor({ socket }: Props) {
         });
     }
 
+    const handleRemoveTile = (tile: AnimationTile) => {
+        if (!state.selectedTile) {
+            return;
+        }
+
+        const animatedTile = state.tileset.tiles.find(t => t.x === state.selectedTile?.x && t.y === state.selectedTile?.y);
+
+        if (!animatedTile) {
+            return;
+        }
+
+        animatedTile.tiles = animatedTile.tiles.filter(t => t.x !== tile.x || t.y !== tile.y);
+
+        setState({
+            ...state,
+            tileset: {
+                ...state.tileset,
+                tiles: [
+                    ...state.tileset.tiles.filter(t => t.x !== animatedTile.x || t.y !== animatedTile.y),
+                    animatedTile
+                ]
+            }
+        });
+
+    }
+
     return (
         <div className="animations-layout">
             <AnimationTiles
@@ -134,6 +160,7 @@ export default function AnimationEditor({ socket }: Props) {
             />
             <AnimationTimeline
                 tile={state.selectedTile}
+                onRemoveTile={handleRemoveTile}
             />
             <AnimationOptions
                 config={state.config}
