@@ -47,9 +47,28 @@ html, body, #root, .app {
         flex-direction: row;
         height: 50%;
 
-        .animation-editor {
+        .animations-layout {
+            display: flex;
+            flex-direction: row;
             height: 100%;
-            width: 50%;
+            width: calc(50% - 4rem);
+
+            .animations-editor {
+                width: calc(100% / 3 * 2);
+                height: 100%;
+                display: grid;
+                grid-template-columns: repeat(5, 64px);
+                grid-template-rows: repeat(5, 64px);
+
+                overflow: auto;
+                padding: 1rem;
+            }
+
+            .animations-config {
+                width: calc(100% / 3);
+                height: 100%;
+                padding: 1rem;
+            }
         }
 
         .options-frame {
@@ -63,4 +82,19 @@ html, body, #root, .app {
     background-position: 100% 100%;
     width: 32px;
     height: 32px;
+    border: 1px solid rgba(16, 57, 81, .5);
+
+    &.animation-tile {
+        width: 64px;
+        height: 64px;
+    }
+}
+
+input {
+    background-color: rgba(16, 57, 81, .5);
+    border: none;
+    outline: none;
+    opacity: .5;
+    padding: 0.5rem;
+    color: #fff;
 }

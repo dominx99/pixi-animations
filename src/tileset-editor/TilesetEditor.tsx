@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useState } from 'react';
 
 export interface Tile {
@@ -41,7 +42,7 @@ export default function TilesetEditor() {
     return (
         <div className="tileset-editor">
             {([...Array(state.metadata.framesY)].map((_, y) => {
-                return <>
+                return <React.Fragment key={y}>
                     {([...Array(state.metadata.framesX)].map((_, x) => {
                         const tile = state.metadata.tiles.find(tile => tile.x === x && tile.y === y);
 
@@ -57,7 +58,7 @@ export default function TilesetEditor() {
                             ></div>
                         )
                     }))}
-                </>
+                </React.Fragment>
             }))}
         </div>
     )
