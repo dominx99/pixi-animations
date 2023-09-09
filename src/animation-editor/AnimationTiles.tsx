@@ -14,10 +14,6 @@ interface Props {
 }
 
 export default function AnimationEditor(props: Props) {
-    useEffect(() => {
-        console.log('got tileset', props.tileset);
-    }, [props.tileset])
-
     return (
         <div className="animations-editor" style={{
             gridTemplateColumns: `repeat(${props.config.framesX}, 64px)`,
@@ -41,7 +37,7 @@ export default function AnimationEditor(props: Props) {
                                 className={'animation-tile tile test' + (props.selectedTile === tile ? ' tile-selected' : '')}
                                 onClick={() => props.handleSelectTile(tile)}
                                 style={tile.tiles.length > 0 ? {
-                                    backgroundImage: `url(${tile.tiles[0].path})`,
+                                    backgroundImage: `url(${tile.tiles[0].url})`,
                                 } : {}}
                             ></div>
                         )

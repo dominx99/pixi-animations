@@ -12,7 +12,7 @@ export default function AnimationTimeline({ tile, onRemoveTile }: Props) {
                 <div
                     className="tile animation-tile flex flex-col" key={i}
                     style={{
-                        backgroundImage: `url(${tile.path})`,
+                        backgroundImage: `url(${tile.url})`,
                     }}
                     onClick={() => onRemoveTile(tile)}
                 ></div>

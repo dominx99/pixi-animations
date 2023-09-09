@@ -35,8 +35,6 @@ html, body, #root, .app {
 
     .tileset-editor {
         display: grid;
-        grid-template-columns: repeat(80, 32px);
-        grid-template-rows: repeat(6, 32px);
 
         height: 50%;
         overflow: auto;
@@ -87,8 +85,8 @@ html, body, #root, .app {
 
 .tile {
     background-size: 100% 100%;
-    width: 32px;
-    height: 32px;
+    width: 48px;
+    height: 48px;
     border: 1px solid rgba(16, 57, 81, .5);
 
     &.animation-tile {

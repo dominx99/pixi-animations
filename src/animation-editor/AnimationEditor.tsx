@@ -52,14 +52,12 @@ export default function AnimationEditor({ socket }: Props) {
 
     const addTileToCurrentAnimationListener = (tiles: Tile[]) => {
         if (!state.selectedTile) {
-            console.log('no selected tile', state);
             return;
         }
 
         const animationTile = state.tileset.tiles.find(tile => tile.x === state.selectedTile?.x && tile.y === state.selectedTile?.y);
 
         if (!animationTile) {
-            console.log('no animation tile', state);
             return;
         }
 
@@ -75,8 +73,6 @@ export default function AnimationEditor({ socket }: Props) {
                 ]
             }
         });
-
-        console.log('got tile', tiles)
     }
 
     useEffect(() => {

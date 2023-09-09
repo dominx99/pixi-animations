@@ -4,6 +4,7 @@ import { EventEmitter } from 'events';
 
 export interface Tile {
     path: string;
+    url: string;
     x: number;
     y: number;
 }
@@ -44,7 +45,13 @@ export default function TilesetEditor({ socket }: Props) {
 
     useEffect(() => {
         const fetchTilesAsync = async () => {
-            const response = await fetch(process.env.REACT_APP_API_URL + '/api/cut-tileset');
+            const id = window.location.pathname.replace('/', '');
+
+            if (id.length !== 36) {
+                return;
+            }
+
+            const response = await fetch(process.env.REACT_APP_API_URL + '/api/tilesets/' + id);
             const metadata = await response.json() as Metadata;
 
             console.log(metadata);
@@ -138,7 +145,10 @@ export default function TilesetEditor({ socket }: Props) {
     }
 
     return (
-        <div className="tileset-editor">
+        <div className="tileset-editor" style={{
+            gridTemplateColumns: `repeat(${state.metadata.framesX}, 48px)`,
+            gridTemplateRows: `repeat(${state.metadata.framesY}, 48px)`,
+        }}>
             {([...Array(state.metadata.framesY)].map((_, y) => {
                 return <React.Fragment key={y}>
                     {([...Array(state.metadata.framesX)].map((_, x) => {
@@ -156,7 +166,7 @@ export default function TilesetEditor({ socket }: Props) {
                                     && state.draw.startPosition.y === tile.y
                                     ? ' tile-selected-start' : ''
                                 )}
-                                style={{ backgroundImage: `url(${tile.path})` }}
+                                style={{ backgroundImage: `url(${tile.url})` }}
                                 onClick={() => handleSelectPoint({ ...tile })}
                             ></div>
                         )
