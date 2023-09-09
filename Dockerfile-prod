@@ -1,13 +1,13 @@
-FROM node:16.14.2-buster
+FROM node:20.6-alpine
 
 WORKDIR /application
 
 COPY . .
 
-RUN yarn install --production --network-timeout 10000000
-RUN yarn build
-RUN yarn global add serve
+RUN npm ci
+RUN npm build
+RUN npm -g i serve
 
 ENV PATH /application/node_modules/.bin:$PATH
 
-CMD ["serve", "-s", "/application/build", "-l", "8114"]
+CMD ["serve", "-s", "/application/build", "-l", "80"]
