@@ -37,8 +37,8 @@ export default function AnimationEditor({ socket }: Props) {
         selectedTile: null
     });
 
-    const handleExport = () => {
-        fetch(process.env.REACT_APP_API_URL + '/api/merge/pixi-animation-tileset', {
+    const handleExport = async () => {
+        const response = await fetch(process.env.REACT_APP_API_URL + '/api/merge/pixi-animation-tileset', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -48,6 +48,15 @@ export default function AnimationEditor({ socket }: Props) {
                 config: state.config,
             }),
         })
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'animation-tileset.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
     }
 
     const addTileToCurrentAnimationListener = (tiles: Tile[]) => {
