@@ -27,6 +27,7 @@ logs:
 	@docker-compose logs -f
 
 init:
+	cp .env.dist .env
 	docker network create \
 		--driver=bridge \
 		--subnet=10.200.0.0/16 \
