@@ -77,6 +77,7 @@ export default function AnimationEditor({ socket }: Props) {
             },
             body: JSON.stringify({
                 tileset: state.tileset,
+                staticTileset: state.staticTileset,
                 config: state.config,
             }),
         })
