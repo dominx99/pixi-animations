@@ -17,7 +17,7 @@ services:
       - traefik.http.routers.tilesets_frontend.rule=Host(`${DOMAIN}`)
       - "traefik.http.routers.tilesets_frontend.tls.certresolver=lets_encrypt_resolver"
     expose:
-      - 3000
+      - 80
     networks:
       proxy:
         ipv4_address: 10.200.31.6

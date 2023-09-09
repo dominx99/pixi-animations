@@ -144,7 +144,7 @@ export default function AnimationEditor({ socket }: Props) {
         });
     }
 
-    const handleRemoveTile = (tile: AnimationTile) => {
+    const handleRemoveTile = (tile: Tile) => {
         if (!state.selectedTile) {
             return;
         }

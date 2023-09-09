@@ -25,3 +25,11 @@ deploy: git-pull down up
 
 logs:
 	@docker-compose logs -f
+
+init:
+	docker network create \
+		--driver=bridge \
+		--subnet=10.200.0.0/16 \
+		--ip-range=10.200.0.0/24 \
+		--gateway=10.200.0.1 \
+		"proxy"

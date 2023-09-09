@@ -9,7 +9,6 @@ interface State {
     config: {
         tileWidth: number;
         tileHeight: number;
-        tileset: File | null;
     }
 }
 

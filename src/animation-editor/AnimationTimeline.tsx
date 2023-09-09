@@ -1,8 +1,9 @@
+import { Tile } from "../tileset-editor/TilesetEditor";
 import { AnimationTile } from "./AnimationEditor";
 
 interface Props {
     tile: AnimationTile | null,
-    onRemoveTile: (tile: AnimationTile) => void
+    onRemoveTile: (tile: Tile) => void
 }
 
 export default function AnimationTimeline({ tile, onRemoveTile }: Props) {
