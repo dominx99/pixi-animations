@@ -60,18 +60,18 @@ export default function OptionsFrame({ socket }: Props) {
                     onChange={handleChangeConfig}
                 />
             </div>
-            <div>
+            <div className="mb-2">
                 <label className="mb-2 block" htmlFor="tileHeight">Tile height</label>
                 <input id="tileHeight" name="tileHeight" className="w-full" type="number" placeholder="5" defaultValue={state.config.tileHeight}
                     onChange={handleChangeConfig}
                 />
             </div>
-            <div>
+            <div className="mb-2">
                 <label className="mb-2 block" htmlFor="import">Import</label>
                 <input
                     type="file"
                     id="import"
-                    className="rounded px-4 py-3"
+                    className="rounded px-4 py-3 w-full"
                     onChange={handleFileChange}
                 />
             </div>
