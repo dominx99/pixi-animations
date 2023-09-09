@@ -38,7 +38,13 @@ export default function AnimationEditor({ socket }: Props) {
     });
 
     const handleExport = async () => {
-        const response = await fetch(process.env.REACT_APP_API_URL + '/api/merge/pixi-animation-tileset', {
+        const id = window.location.pathname.replace('/', '');
+
+        if (id.length !== 36) {
+            return;
+        }
+
+        const response = await fetch(process.env.REACT_APP_API_URL + '/api/tileset/merge/' + id, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
