@@ -57,19 +57,24 @@ html, body, #root, .app {
                 overflow: auto;
             }
 
-            .animations-editor {
-                width: calc(100% / 3 * 2);
+            .animations-tileset {
+                width: calc(100% / 4);
                 height: 100%;
-                display: grid;
-                grid-template-columns: repeat(5, 64px);
-                grid-template-rows: repeat(5, 64px);
-
-                overflow: auto;
                 margin: 1rem;
+                display: flex;
+                flex-direction: column;
+
+                .animations-editor {
+                    display: grid;
+                    grid-template-columns: repeat(5, 64px);
+                    grid-template-rows: repeat(5, 64px);
+
+                    overflow: auto;
+                }
             }
 
             .animations-options {
-                width: calc(100% / 3);
+                width: calc(100% / 4);
                 height: 100%;
                 margin: 1rem;
             }

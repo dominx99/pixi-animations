@@ -1,45 +1,27 @@
-import { Fragment, useEffect, useState } from "react";
-import { AnimationTile, AnimationTileset, SelectedTile, TilesetType } from "./AnimationEditor";
+import { Fragment, useEffect } from "react";
+import { SelectedTile, StaticTile, StaticTileset, TilesetType } from "./AnimationEditor";
 
-export interface AnimationConfig {
+export interface TilesetSize {
     framesX: number,
     framesY: number
-    framesXStatic: number,
-    framesYStatic: number,
 }
 
 interface Props {
-    config: AnimationConfig,
-    tileset: AnimationTileset,
+    config: TilesetSize,
+    tileset: StaticTileset,
     selectedTile: SelectedTile | null,
-    handleSelectTile: (tile: AnimationTile) => void,
+    handleSelectTile: (tile: StaticTile) => void,
+    handleRemoveTile: (tile: StaticTile) => void,
 }
 
-export default function AnimationTiles(props: Props) {
-    const [current, setCurrent] = useState<number>(0);
-    const [lastTileIndex, setLastTileIndex] = useState<number>(0);
-
+export default function StaticEditor(props: Props) {
     useEffect(() => {
-        let max = 0;
-
-        props.tileset.tiles.forEach(tile => {
-            if (tile.tiles.length > (max + 1)) {
-                max = tile.tiles.length - 1;
-            }
-        });
-
-        setLastTileIndex(max);
-    }, [props.tileset]);
-
-    useEffect(() => {
-        setTimeout(() => {
-            setCurrent(current + 1 > lastTileIndex ? 0 : current + 1);
-        }, 1000 / 5);
-    }, [lastTileIndex, current])
+        console.log('config', props.config);
+    }, [props.config]);
 
     return (
         <div className="animations-tileset">
-            <h2 className="mb-2 text-lg text-slate-400">Animated tileset</h2>
+            <h2 className="text-lg mb-2 text-slate-400">Static tileset</h2>
             <div className="animations-editor" style={{
                 gridTemplateColumns: `repeat(${props.config.framesX}, 64px)`,
                 gridTemplateRows: `repeat(${props.config.framesY}, 64px)`,
@@ -62,12 +44,13 @@ export default function AnimationTiles(props: Props) {
                                     className={'animation-tile tile' + (
                                         props.selectedTile?.x === tile.x
                                             && props.selectedTile?.y === tile.y
-                                            && props.selectedTile.type === TilesetType.Animation ? ' tile-selected' : ''
+                                            && props.selectedTile.type === TilesetType.Static ? ' tile-selected' : ''
                                     )}
                                     onClick={() => props.handleSelectTile(tile)}
-                                    style={tile.tiles.length > 0 && tile.tiles[current] ? {
-                                        backgroundImage: `url(${tile.tiles[current].url})`,
-                                    } : {}}
+                                    onDoubleClick={() => props.handleRemoveTile(tile)}
+                                    style={{
+                                        backgroundImage: `url(${tile.tile?.url})`,
+                                    }}
                                 ></div>
                             )
                         }))}

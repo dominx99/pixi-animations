@@ -1,9 +1,10 @@
 import { Fragment, useEffect, useState } from 'react';
 import { EventEmitter } from 'events';
-import { Tile } from './../tileset-editor/TilesetEditor';
+import { Position, Tile } from './../tileset-editor/TilesetEditor';
 import AnimationOptions from './AnimationOptions';
 import AnimationTiles, { AnimationConfig } from './AnimationTiles';
 import AnimationTimeline from './AnimationTimeline';
+import StaticTiles from './StaticTiles';
 
 export interface AnimationTileset {
     tiles: AnimationTile[]
@@ -15,10 +16,30 @@ export interface AnimationTile {
     tiles: Tile[]
 }
 
+export interface StaticTile {
+    x: number,
+    y: number,
+    tile: Tile | null
+}
+
+export interface StaticTileset {
+    tiles: StaticTile[]
+}
+
+export enum TilesetType {
+    Animation = 'animation',
+    Static = 'static'
+}
+
+export interface SelectedTile extends Position {
+    type: TilesetType
+}
+
 export interface AnimationState {
     config: AnimationConfig,
     tileset: AnimationTileset,
-    selectedTile: AnimationTile | null
+    staticTileset: StaticTileset,
+    selectedTile: SelectedTile | null
 }
 
 interface Props {
@@ -29,10 +50,15 @@ export default function AnimationEditor({ socket }: Props) {
     const [state, setState] = useState<AnimationState>({
         config: {
             framesX: 5,
-            framesY: 5
+            framesY: 5,
+            framesXStatic: 5,
+            framesYStatic: 1,
         },
         tileset: {
             tiles: [],
+        },
+        staticTileset: {
+            tiles: []
         },
         selectedTile: null
     });
@@ -70,6 +96,37 @@ export default function AnimationEditor({ socket }: Props) {
             return;
         }
 
+        if (state.selectedTile.type === TilesetType.Animation) {
+            addTileToCurrentAnimation(tiles);
+        }
+
+        if (state.selectedTile.type === TilesetType.Static) {
+            addTileToStaticTile(tiles);
+        }
+    }
+
+    const addTileToStaticTile = (tiles: Tile[]) => {
+        const staticTile = state.staticTileset.tiles.find(tile => tile.x === state.selectedTile?.x && tile.y === state.selectedTile?.y);
+
+        if (!staticTile) {
+            return;
+        }
+
+        staticTile.tile = tiles[0];
+
+        setState({
+            ...state,
+            staticTileset: {
+                ...state.staticTileset,
+                tiles: [
+                    ...state.staticTileset.tiles.filter(tile => tile.x !== staticTile.x || tile.y !== staticTile.y),
+                    staticTile
+                ]
+            }
+        });
+    }
+
+    const addTileToCurrentAnimation = (tiles: Tile[]) => {
         const animationTile = state.tileset.tiles.find(tile => tile.x === state.selectedTile?.x && tile.y === state.selectedTile?.y);
 
         if (!animationTile) {
@@ -94,7 +151,14 @@ export default function AnimationEditor({ socket }: Props) {
         socket.on('animations.current.add-tiles', addTileToCurrentAnimationListener);
         socket.on('tileset.export', handleExport);
 
-        updateAnimatedTileset();
+        const tileset = updateAnimatedTileset();
+        const staticTileset = updateStaticTileset();
+
+        setState({
+            ...state,
+            tileset,
+            staticTileset
+        });
 
         return () => {
             socket.off('animations.current.add-tiles', addTileToCurrentAnimationListener);
@@ -114,14 +178,49 @@ export default function AnimationEditor({ socket }: Props) {
         });
     }
 
-    const handleSelectTile = (tile: AnimationTile | null) => {
+    const handleSelectTile = (tile: AnimationTile | StaticTile | null) => {
+        console.log('handleSelectTile', tile);
+        if (!tile) {
+            return;
+        }
+
         setState({
             ...state,
-            selectedTile: tile
+            selectedTile: {
+                x: tile.x || 0,
+                y: tile.y || 0,
+                type: tile?.hasOwnProperty('tile') ? TilesetType.Static : TilesetType.Animation
+            }
         });
     }
 
-    const updateAnimatedTileset = () => {
+    const updateStaticTileset = (): StaticTileset => {
+        const staticTileset: StaticTileset = {
+            tiles: []
+        };
+
+        const { framesXStatic, framesYStatic } = state.config;
+
+        for (let y = 0; y < framesYStatic; y++) {
+            for (let x = 0; x < framesXStatic; x++) {
+                const tile = state.staticTileset.tiles.find(tile => tile.x === x && tile.y === y);
+
+                if (tile) {
+                    staticTileset.tiles.push(tile);
+                } else {
+                    staticTileset.tiles.push({
+                        x,
+                        y,
+                        tile: null
+                    });
+                }
+            }
+        }
+
+        return staticTileset;
+    }
+
+    const updateAnimatedTileset = (): AnimationTileset => {
         const tileset: AnimationTileset = {
             tiles: []
         };
@@ -144,10 +243,7 @@ export default function AnimationEditor({ socket }: Props) {
             }
         }
 
-        setState({
-            ...state,
-            tileset
-        });
+        return tileset;
     }
 
     const handleRemoveTile = (tile: Tile) => {
@@ -173,7 +269,31 @@ export default function AnimationEditor({ socket }: Props) {
                 ]
             }
         });
+    }
 
+    const handleRemoveStaticTile = (tileToRemove: StaticTile) => {
+        if (!state.selectedTile) {
+            return;
+        }
+
+        const tile = state.staticTileset.tiles.find(t => t.x === tileToRemove.x && t.y === tileToRemove.y);
+
+        if (!tile) {
+            return;
+        }
+
+        tile.tile = null;
+
+        setState({
+            ...state,
+            staticTileset: {
+                ...state.staticTileset,
+                tiles: [
+                    ...state.staticTileset.tiles.filter(t => t.x !== tile.x || t.y !== tile.y),
+                    tile
+                ]
+            }
+        });
     }
 
     return (
@@ -185,8 +305,18 @@ export default function AnimationEditor({ socket }: Props) {
                 handleSelectTile={handleSelectTile}
             />
             <AnimationTimeline
-                tile={state.selectedTile}
+                tile={(state.tileset.tiles.find(tile => tile.x === state.selectedTile?.x && tile.y === state.selectedTile?.y) || null)}
                 onRemoveTile={handleRemoveTile}
+            />
+            <StaticTiles
+                config={{
+                    framesX: state.config.framesXStatic,
+                    framesY: state.config.framesYStatic,
+                }}
+                tileset={state.staticTileset}
+                selectedTile={state.selectedTile}
+                handleSelectTile={handleSelectTile}
+                handleRemoveTile={handleRemoveStaticTile}
             />
             <AnimationOptions
                 config={state.config}
