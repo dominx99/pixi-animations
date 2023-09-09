@@ -19,9 +19,9 @@ export default function AnimationEditor(props: Props) {
             gridTemplateColumns: `repeat(${props.config.framesX}, 64px)`,
             gridTemplateRows: `repeat(${props.config.framesY}, 64px)`,
         }}>
-            {([...Array(props.config.framesY || 0)].map((_, y) => {
+            {([...Array(props.config.framesY > 0 ? props.config.framesY : 0)].map((_, y) => {
                 return <Fragment key={y}>
-                    {([...Array(props.config.framesX || 0)].map((_, x) => {
+                    {([...Array(props.config.framesX > 0 ? props.config.framesX : 0)].map((_, x) => {
                         const tile = props.tileset.tiles.find(tile => tile.x === x && tile.y === y);
 
                         if (!tile) {
