@@ -86,7 +86,7 @@ export default function AnimationEditor({ socket }: Props) {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'animation-tileset.png';
+        a.download = 'result.zip';
         document.body.appendChild(a);
         a.click();
         a.remove();
