@@ -9,7 +9,7 @@ interface State {
     config: {
         tileWidth: number;
         tileHeight: number;
-    }
+    },
 }
 
 export default function OptionsFrame({ socket }: Props) {
@@ -17,7 +17,7 @@ export default function OptionsFrame({ socket }: Props) {
         config: {
             tileWidth: 32,
             tileHeight: 32,
-        }
+        },
     });
 
     const handleChangeConfig = (e: React.ChangeEvent<HTMLInputElement>) => {

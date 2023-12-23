@@ -1,7 +1,7 @@
 import { AnimationConfig } from "./AnimationTiles";
 
 interface Props {
-    handleChangeConfig: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleChangeConfig: (e: React.ChangeEvent<HTMLInputElement>|React.ChangeEvent<HTMLSelectElement>, isNumber?: boolean) => void;
     config: AnimationConfig,
 }
 
@@ -32,7 +32,19 @@ export default function AnimationOptions({ handleChangeConfig, config }: Props) 
                     onChange={handleChangeConfig}
                 />
             </div>
-
+            <div className="mb-2">
+                <label className="mb-2 block" htmlFor="import">Import</label>
+                <select
+                    id="predefined"
+                    name="predefined"
+                    className="rounded px-4 py-3 w-full"
+                    onChange={e => handleChangeConfig(e, false)}
+                    defaultValue="none"
+                >
+                    <option value="none">None</option>
+                    <option value="vertical_to_horizontal">Vertical to horizontal</option>
+                </select>
+            </div>
         </div>
     )
 }

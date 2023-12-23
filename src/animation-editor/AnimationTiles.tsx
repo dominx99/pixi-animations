@@ -6,6 +6,7 @@ export interface AnimationConfig {
     framesY: number
     framesXStatic: number,
     framesYStatic: number,
+    predefined: string,
 }
 
 interface Props {

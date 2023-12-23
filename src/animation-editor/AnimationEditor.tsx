@@ -53,6 +53,7 @@ export default function AnimationEditor({ socket }: Props) {
             framesY: 5,
             framesXStatic: 5,
             framesYStatic: 1,
+            predefined: 'none',
         },
         tileset: {
             tiles: [],
@@ -63,10 +64,39 @@ export default function AnimationEditor({ socket }: Props) {
         selectedTile: null
     });
 
+    const handleExportVerticalToHorizontal = async (id: string) => {
+        const response = await fetch(process.env.REACT_APP_API_URL + '/api/tileset/predefined/' + id, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                config: state.config,
+                transformationType: 'vertical_to_horizontal'
+            }),
+        })
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'result.zip';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    }
+
     const handleExport = async () => {
         const id = window.location.pathname.replace('/', '');
 
         if (id.length !== 36) {
+            return;
+        }
+        console.log('config', state.config);
+
+        if (state.config.predefined === 'vertical_to_horizontal') {
+            handleExportVerticalToHorizontal(id);
+
             return;
         }
 
@@ -167,14 +197,16 @@ export default function AnimationEditor({ socket }: Props) {
         }
     }, [state.config, state.selectedTile]);
 
-    const handleChangeConfig = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChangeConfig = (e: React.ChangeEvent<HTMLInputElement>|React.ChangeEvent<HTMLSelectElement>, isNumber: boolean = true) => {
         const { name, value } = e.target;
+
+        const resultValue = isNumber ? parseInt(value) : value;
 
         setState({
             ...state,
             config: {
                 ...state.config,
-                [name]: parseInt(value)
+                [name]: resultValue
             }
         });
     }
