@@ -43,6 +43,7 @@ export default function AnimationOptions({ handleChangeConfig, config }: Props) 
                 >
                     <option value="none">None</option>
                     <option value="vertical_to_horizontal">Vertical to horizontal</option>
+                    <option value="animate">Animate</option>
                 </select>
             </div>
         </div>

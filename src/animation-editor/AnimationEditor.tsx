@@ -86,16 +86,43 @@ export default function AnimationEditor({ socket }: Props) {
         a.remove();
     }
 
+    const handleAnimate = async (id: string) => {
+        const response = await fetch(process.env.REACT_APP_API_URL + '/api/tileset/predefined/' + id, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                config: state.config,
+                transformationType: 'animate'
+            }),
+        })
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'result.zip';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    }
+
     const handleExport = async () => {
         const id = window.location.pathname.replace('/', '');
 
         if (id.length !== 36) {
             return;
         }
-        console.log('config', state.config);
 
         if (state.config.predefined === 'vertical_to_horizontal') {
             handleExportVerticalToHorizontal(id);
+
+            return;
+        }
+
+        if (state.config.predefined === 'animate') {
+            handleAnimate(id);
 
             return;
         }
